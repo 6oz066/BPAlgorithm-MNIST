@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import math
 
+
 """
 Tool Function Design
 """
@@ -33,7 +34,7 @@ class Input_layer:
         value = in_value
 
 
-class hidden_layer:
+class Hidden_layer:
     def __init__(self,i_line,i_col,learning):
         # Number of element per level
         self.num_line = i_line
@@ -134,7 +135,24 @@ class Output_layer:
         return E_k
 
 class NeuralNetwork:
-    pass
+    def __init__(self,learning_rate,hiddenlevel,x_train,y_train,x_test,y_test):
+        self.input_layer = Input_layer
+        self.learning_rate = learning_rate
+        self.hiddenlevel=hiddenlevel
+        self.hidden_layer = Hidden_layer(x_train.shape[1],self.hiddenlevel,self.learning_rate)
+        self.output_layer = Output_layer(x_train.shape[1],self.learning_rate)
+        self.x_train = x_train
+        self.y_train = y_train
+        self.x_test = x_test
+        self.y_test = y_test
+
+    def train(self):
+        for i in len(self.x_train):
+            self.hidden_layer
+
+    def predict(self):
+        pass
+
 
 """
 Main Function
@@ -166,7 +184,7 @@ if __name__ == '__main__':
     Learning = 0.5
 
     # For test usage
-    a=hidden_layer(784,2,Learning)
+    a=Hidden_layer(784,2,Learning)
     b=Output_layer(784,Learning)
     # print(b.output_result(a.forward_calculate(x_train_flat[100,:])))
     # print(y_train[1])
