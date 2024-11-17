@@ -74,18 +74,22 @@ class hidden_layer:
         for i in reversed(range(x_train.shape[0])):
             if i==0:
                 hidden_bias = Output_layer.backward_train(y_train[i,:])
-
+                for j in range(self.num_col):
+                    self.bias[i,j] = hidden_bias*self.weight_martix[i,j]*d_sigmoid(self.Output_value[i,j])
+                    self.weight_martix[i,j] -= self.bias[i,j] * self.learning
+                    self.threshold_martix[i,j] -= self.bias[i,j] *self.learning
             else:
                 pass
 
 
-    def bias_function(self):
-        pass
+    # Calculate bias except the last level
+    def bias_function(self,bia,i,j,function):
+        function
 
-    # Refresh the loss martix after calculating
-    def loss_function(self,bias_martix,weight_martix):
-        Ek = 1/2 * np.sum(np.dot(bias_martix,weight_martix))
-        return Ek
+
+    # Calculate loss except the last level
+    def loss_function(self,bia,i,j):
+        return bia * self.weight_martix[i,j]
 
 
 class Output_layer:
@@ -110,6 +114,8 @@ class Output_layer:
     def backward_learning(self,y_train):
         self.bias = self.bias_function(y_train,d_sigmoid)
         self.weight -= self.learning* self.bias
+        self.threshold -= self.learning* self.bias
+
         return self.bias
 
     def bias_function(self,y_train,dfunction):
@@ -123,7 +129,7 @@ class Output_layer:
         return E_k
 
 class NeuralNetwork:
-
+    pass
 
 """
 Main Function
