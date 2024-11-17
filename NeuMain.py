@@ -33,7 +33,13 @@ Class Function Design
 class Input_layer:
     def __init__(self,in_value):
         # input value
-        value = in_value
+        self.value = in_value
+
+    def active(self,i):
+        return self.value[i]
+
+    def topreditct(self,x_test):
+        self.value = x_test
 
 
 class Hidden_layer:
@@ -138,7 +144,7 @@ class Output_layer:
 
 class NeuralNetwork:
     def __init__(self, learning_rate, hiddenlevel, x_train_m, y_train_m, x_test_m, y_test_m):
-        self.input_layer = Input_layer
+        self.input_layer = Input_layer(x_train_m)
         self.learning_rate = learning_rate
         self.hiddenlevel= hiddenlevel
         self.hidden_layer = Hidden_layer(x_train_m.shape[1], self.hiddenlevel, self.learning_rate)
@@ -151,14 +157,14 @@ class NeuralNetwork:
     def train(self):
         print("Training active")
         for i in tqdm(range(len(self.x_train)),desc="Training process"):
-            temp_output=self.output_layer.output_result(self.hidden_layer.forward_calculate(self.x_train[i]))
+            temp_output=self.output_layer.output_result(self.hidden_layer.forward_calculate(self.input_layer.active(i)))
             self.hidden_layer.backward_train(self.x_train[i],self.y_train[i],self.output_layer)
 
         print("Training finished for loop times:",len(self.x_train))
 
 
     def predict(self):
-        pass
+        self.input_layer.topreditct(self.x_test)
 
 
 """
