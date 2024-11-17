@@ -2,6 +2,8 @@ from random import random
 import tensorflow as tf
 import numpy as np
 import math
+from tqdm import tqdm
+import time
 
 
 """
@@ -135,20 +137,25 @@ class Output_layer:
         return E_k
 
 class NeuralNetwork:
-    def __init__(self,learning_rate,hiddenlevel,x_train,y_train,x_test,y_test):
+    def __init__(self, learning_rate, hiddenlevel, x_train_m, y_train_m, x_test_m, y_test_m):
         self.input_layer = Input_layer
         self.learning_rate = learning_rate
-        self.hiddenlevel=hiddenlevel
-        self.hidden_layer = Hidden_layer(x_train.shape[1],self.hiddenlevel,self.learning_rate)
-        self.output_layer = Output_layer(x_train.shape[1],self.learning_rate)
-        self.x_train = x_train
-        self.y_train = y_train
-        self.x_test = x_test
-        self.y_test = y_test
+        self.hiddenlevel= hiddenlevel
+        self.hidden_layer = Hidden_layer(x_train_m.shape[1], self.hiddenlevel, self.learning_rate)
+        self.output_layer = Output_layer(x_train_m.shape[1], self.learning_rate)
+        self.x_train = x_train_m
+        self.y_train = y_train_m
+        self.x_test = x_test_m
+        self.y_test = y_test_m
 
     def train(self):
-        for i in len(self.x_train):
-            self.hidden_layer
+        print("Training active")
+        for i in tqdm(range(len(self.x_train)),desc="Training process"):
+            temp_output=self.output_layer.output_result(self.hidden_layer.forward_calculate(self.x_train[i]))
+            self.hidden_layer.backward_train(self.x_train[i],self.y_train[i],self.output_layer)
+
+        print("Training finished for loop times:",len(self.x_train))
+
 
     def predict(self):
         pass
@@ -180,15 +187,18 @@ if __name__ == '__main__':
     print("扁平化后的训练集图像形状:", x_train_flat.shape)
     print("扁平化后的测试集图像形状:", x_test_flat.shape)
 
-    # Learning rate
-    Learning = 0.5
+    model = NeuralNetwork(0.1,3,x_train_flat,y_train_std,x_test_flat,y_test)
+    print(model.hidden_layer.num_col)
+    model.train()
 
     # For test usage
-    a=Hidden_layer(784,2,Learning)
-    b=Output_layer(784,Learning)
+    # Learning rate
+    #     Learning = 0.5
+    # a=Hidden_layer(784,2,Learning)
+    # b=Output_layer(784,Learning)
     # print(b.output_result(a.forward_calculate(x_train_flat[100,:])))
     # print(y_train[1])
-    print(a.weight_martix)
-    for i,j in zip(x_train_flat,y_train_std):
-        a.backward_train(i,j,b)
-    print(a.weight_martix)
+    # print(a.weight_martix)
+    # for i,j in zip(x_train_flat,y_train_std):
+    #     a.backward_train(i,j,b)
+    # print(a.weight_martix)
