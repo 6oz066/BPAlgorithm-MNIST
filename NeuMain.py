@@ -13,10 +13,14 @@ def sigmoid(x):
 # Derivative of sigmoid, use the parameter from f(x)
 def d_sigmoid(f):
     # Jump out of vanishing gradient
-    if f==1.0 or f==0:
-        return 0.001*random()
+    if f==1.0:
+        return 0.001*random()*f
     else:
         return f*(1.0-f)
+
+def d_ad_sigmoid(f):
+    return f*(1-f)
+
 
 """
 Class Function Design
@@ -66,30 +70,31 @@ class hidden_layer:
 
     # For train data, which will import forward method automatically
     def backward_train(self,x_train,y_train,Output_layer):
-        for i in range(x_train.shape[0]):
-            # Run the function to update forward train data
-            Output_layer.output_result(self.forward_calculate(x_train[i,:]))
+
+        # Run the function to update forward train data
+        Output_layer.output_result(self.forward_calculate(x_train))
 
         # Use the loss from output layer to calculate
-        for i in reversed(range(x_train.shape[0])):
-            if i==0:
-                hidden_bias = Output_layer.backward_train(y_train[i,:])
+        for i in reversed(range(self.num_col)):
+            if i==self.num_col-1:
+                hidden_bias = Output_layer.backward_learning(y_train)
                 for j in range(self.num_col):
                     self.bias[i,j] = hidden_bias*self.weight_martix[i,j]*d_sigmoid(self.Output_value[i,j])
                     self.weight_martix[i,j] -= self.bias[i,j] * self.learning
                     self.threshold_martix[i,j] -= self.bias[i,j] *self.learning
             else:
-                pass
+                self.bias[i,:] = self.bias_function(i,d_ad_sigmoid)
+                self.weight_martix[i,:] -= self.bias[i,:] * self.learning
+                self.threshold_martix[i,:] -= self.bias[i,:] * self.learning
 
 
     # Calculate bias except the last level
-    def bias_function(self,bia,i,j,function):
-        function
-
+    def bias_function(self,i,function):
+        return np.dot(function(self.Output_value[i,:]),self.loss_function(i))
 
     # Calculate loss except the last level
-    def loss_function(self,bia,i,j):
-        return bia * self.weight_martix[i,j]
+    def loss_function(self,i):
+        return np.dot(self.bias[i-1,:],self.weight_martix[i,:])
 
 
 class Output_layer:
@@ -163,9 +168,9 @@ if __name__ == '__main__':
     # For test usage
     a=hidden_layer(784,2,Learning)
     b=Output_layer(784,Learning)
-    print(b.output_result(a.forward_calculate(x_train_flat[100,:])))
-    print(y_train[1])
-    print(b.weight)
-    print(b.output)
-    b.backward_learning(y_train_std[1])
-    print(b.weight)
+    # print(b.output_result(a.forward_calculate(x_train_flat[100,:])))
+    # print(y_train[1])
+    print(a.weight_martix)
+    for i,j in zip(x_train_flat,y_train_std):
+        a.backward_train(i,j,b)
+    print(a.weight_martix)
