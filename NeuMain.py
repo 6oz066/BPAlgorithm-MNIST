@@ -12,7 +12,11 @@ def sigmoid(x):
 
 # Derivative of sigmoid, use the parameter from f(x)
 def d_sigmoid(f):
-    return f*(1-f)
+    # Jump out of vanishing gradient
+    if f==1.0 or f==0:
+        return 0.001*random()
+    else:
+        return f*(1.0-f)
 
 """
 Class Function Design
@@ -69,7 +73,8 @@ class hidden_layer:
         # Use the loss from output layer to calculate
         for i in reversed(range(x_train.shape[0])):
             if i==0:
-                pass
+                hidden_bias = Output_layer.backward_train(y_train[i,:])
+
             else:
                 pass
 
@@ -78,8 +83,9 @@ class hidden_layer:
         pass
 
     # Refresh the loss martix after calculating
-    def loss_function(self):
-        pass
+    def loss_function(self,bias_martix,weight_martix):
+        Ek = 1/2 * np.sum(np.dot(bias_martix,weight_martix))
+        return Ek
 
 
 class Output_layer:
@@ -102,19 +108,21 @@ class Output_layer:
         return function(input-(self.threshold))
 
     def backward_learning(self,y_train):
-        self.bias = self.bias_function(y_train,d_sigmoid(self.output))
-
+        self.bias = self.bias_function(y_train,d_sigmoid)
+        self.weight -= self.learning* self.bias
+        return self.bias
 
     def bias_function(self,y_train,dfunction):
         loss = self.loss_function(y_train)
         d_f = dfunction(self.output)
         return loss*d_f
 
-
     # Loss Function
     def loss_function(self,y_train):
         E_k=1/2*(self.output-y_train)**2
         return E_k
+
+class NeuralNetwork:
 
 
 """
@@ -151,3 +159,7 @@ if __name__ == '__main__':
     b=Output_layer(784,Learning)
     print(b.output_result(a.forward_calculate(x_train_flat[100,:])))
     print(y_train[1])
+    print(b.weight)
+    print(b.output)
+    b.backward_learning(y_train_std[1])
+    print(b.weight)
