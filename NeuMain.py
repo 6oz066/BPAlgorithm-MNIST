@@ -4,6 +4,7 @@ import numpy as np
 import math
 from tqdm import tqdm
 import time
+import matplotlib.pyplot as plt
 
 
 """
@@ -154,6 +155,8 @@ class NeuralNetwork:
         self.x_test = x_test_m
         self.y_test = y_test_m
 
+        self.correct=0
+
     def train(self):
         print("Training active")
         for i in tqdm(range(len(self.x_train)),desc="Training process"):
@@ -165,7 +168,22 @@ class NeuralNetwork:
 
     def predict(self):
         self.input_layer.topreditct(self.x_test)
+        self.correct=0
+        dynamic_correct_rate =0
+        dynamic_correct_point = np.zeros(len(self.x_test),dtype=float)
+        for i in tqdm(range(len(self.x_test)),desc="Testing process"):
+            predict_result = self.output_layer.output_result(self.hidden_layer.forward_calculate(self.input_layer.active(i)))
+            if predict_result == self.y_test[i]:
+                self.correct+=1
+                dynamic_correct_rate = self.correct/(i+1)
+                dynamic_correct_point[i]=(dynamic_correct_rate)
 
+        plot_x = np.linspace(0,len(self.x_test),len(self.x_test))
+        plot_y = dynamic_correct_point
+        plt.plot(plot_x,plot_y)
+        plt.legend(["Loop time","Correct Rate"])
+        plt.title("Dynamic Predicted Correct Rate")
+        plt.show()
 
 """
 Main Function
@@ -195,7 +213,8 @@ if __name__ == '__main__':
 
     model = NeuralNetwork(0.1,3,x_train_flat,y_train_std,x_test_flat,y_test)
     print(model.hidden_layer.num_col)
-    model.train()
+    # model.train()
+    model.predict()
 
     # For test usage
     # Learning rate
